@@ -56,8 +56,8 @@ class Grades:
 
     completedQuestions = set([])
     for q in self.questions:
-      print '\nQuestion %s' % q
-      print '=' * (9 + len(q))
+      print('\nQuestion %s' % q)
+      print('=' * (9 + len(q)))
       print
       self.currentQuestion = q
 
@@ -74,8 +74,8 @@ class Grades:
       try:
         util.TimeoutFunction(getattr(gradingModule, q),300)(self) # Call the question's function
         #TimeoutFunction(getattr(gradingModule, q),1200)(self) # Call the question's function
-      except Exception, inst:
-        self.addExceptionMessage(q, inst, traceback)
+      except Exception as inst:
+        self.addExceptionMessage(inst)
         self.addErrorHints(exceptionMap, inst, q[1])
       except:
         self.fail('FAIL: Terminated with a string exception.')
@@ -85,18 +85,18 @@ class Grades:
       if self.points[q] >= self.maxes[q]:
         completedQuestions.add(q)
 
-      print '\n### Question %s: %d/%d ###\n' % (q, self.points[q], self.maxes[q])
+      print('\n### Question %s: %d/%d ###\n' % (q, self.points[q], self.maxes[q]))
 
 
-    print '\nFinished at %d:%02d:%02d' % time.localtime()[3:6]
+    print('\nFinished at %d:%02d:%02d' % time.localtime()[3:6])
     print "\nProvisional grades\n=================="
 
     for q in self.questions:
-      print 'Question %s: %d/%d' % (q, self.points[q], self.maxes[q])
-    print '------------------'
-    print 'Total: %d/%d' % (self.points.totalCount(), sum(self.maxes.values()))
+      print('Question %s: %d/%d' % (q, self.points[q], self.maxes[q]))
+    print('------------------')
+    print('Total: %d/%d' % (self.points.totalCount(), sum(self.maxes.values())))
     if bonusPic and self.points.totalCount() == 25:
-      print """
+      print(""")
 
                      ALL HAIL GRANDPAC.
               LONG LIVE THE GHOSTBUSTING KING.
@@ -128,15 +128,15 @@ class Grades:
                     @@@@@@@@@@@@@@@@@@
 
 """
-    print """
+    print("""
 Your grades are NOT yet registered.  To register your grades, make sure
 to follow your instructor's guidelines to receive credit on your project.
-"""
+""")
 
     if self.edxOutput:
         self.produceOutput()
 
-  def addExceptionMessage(self, q, inst, traceback):
+  def addExceptionMessage(self, inst):
     """
     Method to format the exception message, this is more complicated because
     we need to cgi.escape the traceback but wrap the exception in a <pre> tag
@@ -154,11 +154,11 @@ to follow your instructor's guidelines to receive credit on your project.
     # question specific error hints
     if exceptionMap.get(questionName):
       questionMap = exceptionMap.get(questionName)
-      if (questionMap.get(typeOf)):
+      if questionMap.get(typeOf):
         errorHint = questionMap.get(typeOf)
     # fall back to general error messages if a question specific
     # one does not exist
-    if (exceptionMap.get(typeOf)):
+    if exceptionMap.get(typeOf):
       errorHint = exceptionMap.get(typeOf)
 
     # dont include the HTML if we have no error hint
@@ -248,13 +248,13 @@ to follow your instructor's guidelines to receive credit on your project.
     if not raw:
         # We assume raw messages, formatted for HTML, are printed separately
         if self.mute: util.unmutePrint()
-        print '*** ' + message
+        print('*** ' + message)
         if self.mute: util.mutePrint()
         message = cgi.escape(message)
     self.messages[self.currentQuestion].append(message)
 
   def addMessageToEmail(self, message):
-    print "WARNING**** addMessageToEmail is deprecated %s" % message
+    print("WARNING**** addMessageToEmail is deprecated %s" % message)
     for line in message.split('\n'):
       pass
       #print '%%% ' + line + ' %%%'
