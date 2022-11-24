@@ -38,11 +38,12 @@ class RandomGhost( GhostAgent ):
     "A ghost that chooses a legal action uniformly at random."
     def getDistribution( self, state ):
         dist = util.Counter()
-        for a in state.getLegalActions( self.index ): dist[a] = 1.0
+        for a in state.get_legal_actions( self.index ): dist[a] = 1.0
         dist.normalize()
         return dist
 
-class DirectionalGhost( GhostAgent ):
+
+class DirectionalGhost(GhostAgent):
     "A ghost that prefers to rush Pacman, or flee when scared."
     def __init__( self, index, prob_attack=0.8, prob_scaredFlee=0.8 ):
         self.index = index
@@ -52,7 +53,7 @@ class DirectionalGhost( GhostAgent ):
     def getDistribution( self, state ):
         # Read variables from state
         ghostState = state.getGhostState( self.index )
-        legalActions = state.getLegalActions( self.index )
+        legalActions = state.get_legal_actions( self.index )
         pos = state.getGhostPosition( self.index )
         isScared = ghostState.scaredTimer > 0
 

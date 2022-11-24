@@ -1,4 +1,4 @@
-# pacman.py
+# main.py
 # ---------
 # Licensing Information: Please do not distribute or publish solutions to this
 # project. You are free to use and extend these projects for educational
@@ -79,19 +79,20 @@ class GameState:
 
     get_and_reset_explored = staticmethod(get_and_reset_explored)
 
-    def getLegalActions(self, agent_index=0):
+    def get_legal_actions(self, agent_index=0):
         """
         Returns the legal actions for the agent specified.
         """
         GameState.explored.add(self)
-        if self.is_win() or self.isLose(): return []
+        if self.is_win() or \
+                self.isLose():
+            return []
 
         if agent_index == 0:  # Pacman is moving
-            return PacmanRules.getLegalActions(self)
-        else:
-            return GhostRules.getLegalActions(self, agent_index)
+            return PacmanRules.get_legal_actions(self)
+        return GhostRules.get_legal_actions(self, agent_index)
 
-    def generateSuccessor(self, agent_index, action):
+    def generate_successor(self, agent_index, action):
         """
         Returns the successor state after the specified agent takes the action.
         """
@@ -121,16 +122,16 @@ class GameState:
         state.data.score += state.data.scoreChange
         return state
 
-    def getLegalPacmanActions(self):
-        return self.getLegalActions(0)
+    def get_legal_pacman_actions(self):
+        return self.get_legal_actions(0)
 
-    def generatePacmanSuccessor(self, action):
+    def generate_pacman_successor(self, action):
         """
         Generates the successor state after the specified pacman move
         """
-        return self.generateSuccessor(0, action)
+        return self.generate_successor(0, action)
 
-    def getPacmanState(self):
+    def get_pacman_state(self):
         """
         Returns an AgentState object for pacman (in game.py)
 
@@ -341,21 +342,21 @@ class PacmanRules:
     """
     PACMAN_SPEED = 1
 
-    def getLegalActions(state):
+    def get_legal_actions(state):
         """
         Returns a list of possible actions.
         """
-        return Actions.getPossibleActions(state.getPacmanState().
+        return Actions.getPossibleActions(state.get_pacman_state().
                                           configuration,
                                           state.data.layout.walls)
 
-    getLegalActions = staticmethod(getLegalActions)
+    get_legal_actions = staticmethod(get_legal_actions)
 
     def applyAction(state, action):
         """
         Edits the state to reflect the results of the action.
         """
-        legal = PacmanRules.getLegalActions(state)
+        legal = PacmanRules.get_legal_actions(state)
         if action not in legal:
             raise Exception("Illegal action " + str(action))
 
@@ -363,7 +364,7 @@ class PacmanRules:
 
         # Update Configuration
         vector = Actions.directionToVector(action, PacmanRules.PACMAN_SPEED)
-        pacmanState.configuration = pacmanState.configuration.generateSuccessor(vector)
+        pacmanState.configuration = pacmanState.configuration.generate_successor(vector)
 
         # Eat
         next = pacmanState.configuration.getPosition()
@@ -403,7 +404,7 @@ class GhostRules:
     """
     GHOST_SPEED = 1.0
 
-    def getLegalActions(state, ghostIndex):
+    def get_legal_actions(state, ghostIndex):
         """
         Ghosts cannot stop, and cannot turn around unless they
         reach a dead end, but can turn 90 degrees at intersections.
@@ -417,11 +418,11 @@ class GhostRules:
             possibleActions.remove(reverse)
         return possibleActions
 
-    getLegalActions = staticmethod(getLegalActions)
+    get_legal_actions = staticmethod(get_legal_actions)
 
     def applyAction(state, action, ghostIndex):
 
-        legal = GhostRules.getLegalActions(state, ghostIndex)
+        legal = GhostRules.get_legal_actions(state, ghostIndex)
         if action not in legal:
             raise Exception("Illegal ghost action " + str(action))
 
@@ -429,7 +430,7 @@ class GhostRules:
         speed = GhostRules.GHOST_SPEED
         if ghostState.scaredTimer > 0: speed /= 2.0
         vector = Actions.directionToVector(action, speed)
-        ghostState.configuration = ghostState.configuration.generateSuccessor(vector)
+        ghostState.configuration = ghostState.configuration.generate_successor(vector)
 
     applyAction = staticmethod(applyAction)
 
@@ -657,7 +658,7 @@ def replay_game(layout, actions, display):
 
     for action in actions:
         # Execute the action
-        state = state.generateSuccessor(*action)
+        state = state.generate_successor(*action)
         # Change the display
         display.update(state.data)
         # Allow for game specific conditions (winning, losing, etc.)

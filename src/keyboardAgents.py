@@ -50,7 +50,7 @@ class KeyboardAgent(Agent):
         if keys:
             self.keys = keys
 
-        legal = state.getLegalActions(self.index)
+        legal = state.get_legal_actions(self.index)
         move = self.getmove(legal)
 
         if move == Directions.STOP:
