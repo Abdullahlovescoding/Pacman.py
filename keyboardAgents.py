@@ -15,7 +15,7 @@
 import random
 
 from game import Directions
-from multiagent.game import Agent
+from game import Agent
 
 
 class KeyboardAgent(Agent):
