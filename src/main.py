@@ -85,7 +85,7 @@ class GameState:
         """
         GameState.explored.add(self)
         if self.is_win() or \
-                self.isLose():
+                self.is_lose():
             return []
 
         if agent_index == 0:  # Pacman is moving
@@ -97,7 +97,7 @@ class GameState:
         Returns the successor state after the specified agent takes the action.
         """
         # Check that successors exist
-        if self.is_win() or self.isLose():
+        if self.is_win() or self.is_lose():
             raise Exception('Can\'t generate a successor of a terminal state.')
 
         # Copy current state
@@ -105,7 +105,7 @@ class GameState:
 
         # Let agent's logic deal with its action's effects on the board
         if agent_index == 0:
-            state.data._eaten = [False for i in range(state.getNumAgents())]
+            state.data._eaten = [False for i in range(state.get_num_agents())]
             PacmanRules.applyAction(state, action)
         else:  # A ghost is moving
             GhostRules.applyAction(state, action, agent_index)
@@ -123,6 +123,9 @@ class GameState:
         return state
 
     def get_legal_pacman_actions(self):
+        """
+        :return:
+        """
         return self.get_legal_actions(0)
 
     def generate_pacman_successor(self, action):
@@ -140,29 +143,52 @@ class GameState:
         """
         return self.data.agentStates[0].copy()
 
-    def getPacmanPosition(self):
+    def get_pacman_position(self):
+        """
+        :return:
+        """
         return self.data.agentStates[0].getPosition()
 
-    def getGhostStates(self):
+    def get_ghost_states(self):
+        """
+        :return:
+        """
         return self.data.agentStates[1:]
 
-    def getGhostState(self, agent_index):
-        if agent_index == 0 or agent_index >= self.getNumAgents():
-            raise Exception("Invalid index passed to getGhostState")
+    def get_ghost_state(self, agent_index):
+        """
+        :param agent_index:
+        :return:
+        """
+        if agent_index == 0 or agent_index >= self.get_num_agents():
+            raise Exception("Invalid index passed to get_ghost_state")
         return self.data.agentStates[agent_index]
 
-    def getGhostPosition(self, agent_index):
+    def get_ghost_position(self, agent_index):
+        """
+        :param agent_index:
+        :return:
+        """
         if agent_index == 0:
-            raise Exception("Pacman's index passed to getGhostPosition")
+            raise Exception("Pacman's index passed to get_ghost_position")
         return self.data.agentStates[agent_index].getPosition()
 
-    def getGhostPositions(self):
-        return [s.getPosition() for s in self.getGhostStates()]
+    def get_ghost_positions(self):
+        """
+        :return:
+        """
+        return [s.getPosition() for s in self.get_ghost_states()]
 
-    def getNumAgents(self):
+    def get_num_agents(self):
+        """
+        :return:
+        """
         return len(self.data.agentStates)
 
     def get_score(self):
+        """
+        :return:
+        """
         return self.data.score
 
     def get_capsules(self):
@@ -171,7 +197,10 @@ class GameState:
         """
         return self.data.capsules
 
-    def getNumFood(self):
+    def get_num_food(self):
+        """
+        :return:
+        """
         return self.data.food.count()
 
     def get_food(self):
@@ -198,16 +227,32 @@ class GameState:
         """
         return self.data.layout.walls
 
-    def hasFood(self, x, y):
-        return self.data.food[x][y]
+    def has_food(self, x_food, y_food):
+        """
+        :param x_food:
+        :param y_food:
+        :return:
+        """
+        return self.data.food[x_food][y_food]
 
-    def hasWall(self, x, y):
-        return self.data.layout.walls[x][y]
+    def has_wall(self, x_food, y_food):
+        """
+        :param x_food:
+        :param y_food:
+        :return:
+        """
+        return self.data.layout.walls[x_food][y_food]
 
-    def isLose(self):
+    def is_lose(self):
+        """
+        :return:
+        """
         return self.data.lose
 
     def is_win(self):
+        """
+        :return:
+        """
         return self.data.win
 
     #############################################
@@ -215,18 +260,21 @@ class GameState:
     # You shouldn't need to call these directly #
     #############################################
 
-    def __init__(self, prevState=None):
+    def __init__(self, prev_state=None):
         """
         Generates a new state by copying information from its predecessor.
         """
-        if prevState is not None:  # Initial state
-            self.data = GameStateData(prevState.data)
+        if prev_state is not None:  # Initial state
+            self.data = GameStateData(prev_state.data)
         else:
             self.data = GameStateData()
 
-    def deepCopy(self):
+    def deep_copy(self):
+        """
+        :return:
+        """
         state = GameState(self)
-        state.data = self.data.deepCopy()
+        state.data = self.data.deep_copy()
         return state
 
     def __eq__(self, other=None):
@@ -252,11 +300,11 @@ class GameState:
 
         return str(self.data)
 
-    def initialize(self, layout, numGhostAgents=1000):
+    def initialize(self, layout, num_ghost_agents=1000):
         """
         Creates an initial game state from a layout array (see layout.py).
         """
-        self.data.initialize(layout, numGhostAgents)
+        self.data.initialize(layout, num_ghost_agents)
 
 
 ############################################################################
@@ -270,6 +318,17 @@ COLLISION_TOLERANCE = 0.7  # How close ghosts must be to Pacman to kill
 TIME_PENALTY = 1  # Number of points lost each round
 
 
+def agentCrash(game, agent_index):
+    if agent_index == 0:
+        print("Pacman crashed")
+    else:
+        print("A ghost crashed")
+
+
+def getMaxTimeWarnings(agent_index):
+    return 0
+
+
 class ClassicGameRules:
     """
     These game rules manage the control flow of a game, deciding when
@@ -277,6 +336,8 @@ class ClassicGameRules:
     """
 
     def __init__(self, timeout=30):
+        self.quiet = None
+        self.initial_state = None
         self.timeout = timeout
 
     def newGame(self, layout,
@@ -289,7 +350,7 @@ class ClassicGameRules:
         game = Game(agents, display,
                     self, catch_exceptions)
         game.state = initState
-        self.initialState = initState.deepCopy()
+        self.initial_state = initState.deep_copy()
         self.quiet = quiet
         return game
 
@@ -299,7 +360,7 @@ class ClassicGameRules:
         """
         if state.is_win():
             self.win(state, game)
-        if state.isLose():
+        if state.is_lose():
             self.lose(state, game)
 
     def win(self, state, game):
@@ -311,13 +372,7 @@ class ClassicGameRules:
         game.gameOver = True
 
     def getProgress(self, game):
-        return float(game.state.getNumFood()) / self.initialState.getNumFood()
-
-    def agentCrash(self, game, agent_index):
-        if agent_index == 0:
-            print("Pacman crashed")
-        else:
-            print("A ghost crashed")
+        return float(game.state.get_num_food()) / self.initial_state.get_num_food()
 
     def getMaxTotalTime(self, agent_index):
         return self.timeout
@@ -330,9 +385,6 @@ class ClassicGameRules:
 
     def getMoveTimeout(self, agent_index):
         return self.timeout
-
-    def getMaxTimeWarnings(self, agent_index):
-        return 0
 
 
 class PacmanRules:
@@ -383,7 +435,7 @@ class PacmanRules:
             state.data.food = state.data.food.copy()
             state.data.food[x][y] = False
             state.data._foodEaten = position
-            numFood = state.getNumFood()
+            numFood = state.get_num_food()
             if numFood == 0 and not state.data._lose:
                 state.data.scoreChange += 500
                 state.data._win = True
@@ -409,7 +461,7 @@ class GhostRules:
         Ghosts cannot stop, and cannot turn around unless they
         reach a dead end, but can turn 90 degrees at intersections.
         """
-        conf = state.getGhostState(ghostIndex).configuration
+        conf = state.get_ghost_state(ghostIndex).configuration
         possibleActions = Actions.getPossibleActions(conf, state.data.layout.walls)
         reverse = Actions.reverseDirection(conf.direction)
         if Directions.STOP in possibleActions:
@@ -443,7 +495,7 @@ class GhostRules:
     decrement_timer = staticmethod(decrement_timer)
 
     def checkDeath(state, agent_index):
-        pacman_position = state.getPacmanPosition()
+        pacman_position = state.get_pacman_position()
         if agent_index == 0:  # Pacman just moved; Anyone can kill him
             for index in range(1, len(state.data.agentStates)):
                 ghostState = state.data.agentStates[index]
@@ -523,7 +575,7 @@ def read_command(argv):
                       help=default('the number of GAMES to play'), metavar='GAMES', default=1)
     parser.add_option('-l', '--layout', dest='layout',
                       help=default('the LAYOUT_FILE from which to load the map layout'),
-                      metavar='LAYOUT_FILE', default='mediumClassic')
+                      metavar='LAYOUT_FILE', default='originalClassic')
     parser.add_option('-p', '--pacman', dest='pacman',
                       help=default('the agent TYPE in the pacmanAgents module to use'),
                       metavar='TYPE', default='KeyboardAgent')
