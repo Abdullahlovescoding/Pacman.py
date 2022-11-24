@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: Pacman
+Version: 3.10.0
+Summary: Pacman in python 3.10
+Home-page: https://github.com/Abdullahlovescoding/pacmanpy
+Author: Abdullahlovescoding
+Author-email: obi.kenobipro@gmail.com
+License: UNKNOWN
+Project-URL: Source, https://github.com/pypa/sampleproject/
+Keywords: Pacman,Python,Pycharm
+Platform: UNKNOWN
+Classifier: Development Status :: 3 Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Games/Entertainment :: Arcade
+Classifier: License :: This software may only be obtained by sending the author an e-mail, and then the user promises not to redistribute it. BSD License https://opensource.org/licenses/BSD-3-Clause 
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+Python 3.X implementation of Pacman
+
